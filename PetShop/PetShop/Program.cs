@@ -7,11 +7,10 @@ namespace PetShop
 {
     class Program
     {
-        static IPetRepository petRepository;
 
         static void Main(string[] args)
         {
-            petRepository = new PetRepository();
+           
             Pet brunoDoggy = new Pet
             {
                 Id = 1,
