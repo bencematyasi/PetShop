@@ -10,7 +10,6 @@ namespace PetShopApp
     public class Printer
     {
         private IPetRepository petRepository;
-        
 
         public Printer()
         {
@@ -18,12 +17,7 @@ namespace PetShopApp
             InitData();
             StartUI();
         }
-
-        private void StartUI()
-        {
-            throw new NotImplementedException();
-        }
-
+        
         void InitData()
         {
             Pet brunoDoggy = new Pet
@@ -64,7 +58,7 @@ namespace PetShopApp
             };
             petRepository.Creat(sammyTurtle);
 
-            Pet thunderStromHorse= new Pet
+            Pet thunderStromHorse = new Pet
             {
                 Id = 1,
                 Name = "Thunder Storm",
@@ -94,25 +88,31 @@ namespace PetShopApp
             };
 
             var selection = ShowMenu(menuItems);
-            
-            while (selection != 6)
+
+            while (selection != 8)
             {
                 switch (selection)
                 {
                     case 1:
-                        var
+                        ShowAllPets();
                         break;
                     case 2:
-                        AddCar();
+                        SearchByType();
                         break;
                     case 3:
-                        DeleteCar();
+                        AddPet();
                         break;
                     case 4:
-                        Console.WriteLine("Update Car");
+                        UpdatePet();
                         break;
                     case 5:
-                        ShowCheapestCars();
+                        DeletePet();
+                        break;
+                    case 6:
+                        SortPetByPrice();
+                        break;
+                    case 7:
+                        GetFiveCheapestPets();
                         break;
                     default:
                         break;
@@ -123,6 +123,17 @@ namespace PetShopApp
 
             Console.ReadLine();
         }
+
+         private Pet FindPetById()
+         {
+            Console.WriteLine("Insert pet id: ");
+            int id;
+            if (!int.TryParse(Console.ReadLine(), out id))
+            {
+                Console.WriteLine("Please insert a number ");
+            }
+            return petRepository.ReadById(id);
+         }
 
         private void ShowAllPets()
         {
@@ -135,10 +146,78 @@ namespace PetShopApp
 
             }
         }
-    }
-        public static int ShowMenu(string[] menuItems)
+
+        private void SearchByType()
         {
-            
+            throw new NotImplementedException();
+        }
+
+        private void AddPet()
+        {
+            Console.WriteLine("Enter Name: ");
+            string name = Console.ReadLine();
+
+            Console.WriteLine("Enter Type: ");
+            string type = Console.ReadLine();
+
+            Console.WriteLine(" Enter Birthday: "); 
+            DateTime birthday = DateTime.Parse(Console.ReadLine());
+
+            Console.WriteLine("Enter Sold Date: ");
+            DateTime soldDate = DateTime.Parse(Console.ReadLine());
+
+            Console.WriteLine("Enter Color: ");
+            string color = Console.ReadLine();
+
+            Console.WriteLine("Enter Previous Owner of " + name);
+            string previousOwner = Console.ReadLine();
+
+            Console.WriteLine("Enter The Price");
+            double price = Convert.ToDouble(Console.ReadLine());
+
+            var pet = new Pet()
+            {
+                Name = name,
+                Type = type,
+                BirthDay = birthday,
+                SoldDate = soldDate,
+                Color = color,
+                PreviousOwner = previousOwner,
+                Price = price
+            };
+
+            petRepository.Creat(pet);
+
+
+        }
+
+        private void UpdatePet()
+        {
+            throw new NotImplementedException();
+        }
+
+        private void DeletePet()
+        {
+            var petFound = FindPetById();
+            if(petFound != null)
+            {
+                petRepository.Delete(petFound.Id);
+            }
+        }   
+
+        private void SortPetByPrice()
+        {
+            throw new NotImplementedException();
+        }
+       
+        private void GetFiveCheapestPets()
+        {
+            throw new NotImplementedException();
+        }
+        
+        private int ShowMenu(string[] menuItems)
+        {
+
             Console.WriteLine("Select a menu");
             Console.WriteLine("------------------------------");
             for (int i = 0; i < menuItems.Length; i++)

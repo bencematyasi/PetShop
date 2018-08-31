@@ -64,5 +64,10 @@ namespace PetShopApp.Infrastructure.Static.Data.Reporsitories
             return null;
 
         }
+
+        //public SortedList<Pet, int> SortedList()
+        //{
+            
+        //}
     }
 }
