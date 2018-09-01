@@ -64,10 +64,15 @@ namespace PetShopApp.Infrastructure.Static.Data.Reporsitories
             return null;
 
         }
+        
+        public Pet ReadOne(int id)
+        {
+            return _pets[id];
+        }
 
-        //public SortedList<Pet, int> SortedList()
+        //public void Sorting()
         //{
-            
-        //}
-    }
+        //    _pets.Sort();
+        }
+
 }

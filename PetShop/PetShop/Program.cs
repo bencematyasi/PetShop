@@ -8,7 +8,7 @@ namespace PetShop
         static void Main(string[] args)
         {
 
-            Printer p = new Printer();
+            var p = new Printer();
            
 
         }

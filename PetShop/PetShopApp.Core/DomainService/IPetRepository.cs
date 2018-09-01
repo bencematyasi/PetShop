@@ -13,10 +13,14 @@ namespace PetShopApp.Core.DomainService
 
         List<Pet> ReadAll();
 
+        Pet ReadOne(int id);
+
         Pet Update(Pet petUpdate);
 
         Pet Delete(int id);
 
-        //SortedList<Pet, int> SortedList();
+        //void Sorting()
+
+        
     }
 }

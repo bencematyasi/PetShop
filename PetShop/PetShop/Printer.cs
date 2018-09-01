@@ -3,28 +3,34 @@ using PetShopApp.Core.Entity;
 using PetShopApp.Infrastructure.Static.Data.Reporsitories;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace PetShopApp
 {
     public class Printer
     {
+        #region Repository area
         private IPetRepository petRepository;
+        #endregion
 
-        public Printer()
+        #region Printer constructor
+        public Printer()    
         {
             petRepository = new PetRepository();
             InitData();
             StartUI();
         }
-        
+        #endregion
+
+        #region InitDat method, move to AplicationService
         void InitData()
         {
             Pet brunoDoggy = new Pet
             {
                 Name = "Bruno",
                 Type = "dog",
-                BirthDay = new DateTime(2010, 10, 05).Date,
+                BirthDay = new DateTime(2010, 10, 05),
                 SoldDate = new DateTime(2010, 11, 05).Date,
                 Color = "blueish",
                 PreviousOwner = "Danny Boy",
@@ -72,6 +78,7 @@ namespace PetShopApp
             };
             petRepository.Creat(thunderStromHorse);
         }
+        #endregion
 
         void StartUI()
         {
@@ -124,7 +131,7 @@ namespace PetShopApp
             Console.ReadLine();
         }
 
-         private Pet FindPetById()
+         Pet FindPetById()
          {
             Console.WriteLine("Insert pet id: ");
             int id;
@@ -135,25 +142,31 @@ namespace PetShopApp
             return petRepository.ReadById(id);
          }
 
-        private void ShowAllPets()
+        void ShowAllPets()
         {
+            Console.Clear();
+            Console.WriteLine("List of All Pets\n");
+            
             var listOfPets = petRepository.ReadAll();
             foreach (var pet in listOfPets)
             {
-                Console.WriteLine("name: {0}\ntype: {1}\nBirtday: {2}\nsold date: {3}\ncolor: {4}\nPrevious owner: {5}\nprice: ${6}",
-                    pet.Name, pet.Type, pet.BirthDay, pet.SoldDate, pet.Color, pet.PreviousOwner, pet.Price);
+                Console.WriteLine("id: {0}\nName: {1}\nType: {2}\nBirtday: {3}\nSold date: {4}\nColor: {5}\nPrevious owner: {6}\nPrice: ${7}",
+                    pet.Id, pet.Name, pet.Type, pet.BirthDay, pet.SoldDate, pet.Color, pet.PreviousOwner, pet.Price);
                 Console.WriteLine("------------------------------");
 
             }
         }
 
-        private void SearchByType()
+        void SearchByType()
         {
             throw new NotImplementedException();
         }
 
-        private void AddPet()
+        void AddPet()
         {
+            Console.Clear();
+            Console.WriteLine("Add a Pet\n");
+
             Console.WriteLine("Enter Name: ");
             string name = Console.ReadLine();
 
@@ -191,13 +204,44 @@ namespace PetShopApp
 
         }
 
-        private void UpdatePet()
+        void UpdatePet()
         {
-            throw new NotImplementedException();
+            Console.Clear();
+            Console.WriteLine("Update a Pet\n");
+
+            var onePet = FindPetById();
+
+            var pet = petRepository.ReadOne(onePet.Id);
+            Console.WriteLine("id: {0}\nName: {1}\nType: {2}\nBirtday: {3}\nSold date: {4}\nColor: {5}\nPrevious owner: {6}\nPrice: ${7}",
+            pet.Id, pet.Name, pet.Type, pet.BirthDay, pet.SoldDate, pet.Color, pet.PreviousOwner, pet.Price);
+            Console.WriteLine("------------------------------");
+
+            Console.WriteLine("Enter Name: ");
+            pet.Name = Console.ReadLine();
+
+            Console.WriteLine("Enter Type: ");
+            pet.Type = Console.ReadLine();
+
+            Console.WriteLine(" Enter Birthday: ");
+            pet.BirthDay = DateTime.Parse(Console.ReadLine());
+
+            Console.WriteLine("Enter Sold Date: ");
+            pet.SoldDate= DateTime.Parse(Console.ReadLine());
+
+            Console.WriteLine("Enter Color: ");
+            pet.Color = Console.ReadLine();
+
+            Console.WriteLine("Enter Previous Owner of " + pet.Name);
+            pet.PreviousOwner = Console.ReadLine();
+
+            Console.WriteLine("Enter The Price");
+            pet.Price = Convert.ToDouble(Console.ReadLine());
         }
 
-        private void DeletePet()
+        void DeletePet()
         {
+            Console.Clear();
+            Console.WriteLine("Delete a Pet\n");
             var petFound = FindPetById();
             if(petFound != null)
             {
@@ -205,17 +249,31 @@ namespace PetShopApp
             }
         }   
 
-        private void SortPetByPrice()
+        void SortPetByPrice()
         {
-            throw new NotImplementedException();
+            //Console.Clear();
+            //Console.WriteLine("Sorting by price\n");
+            //List<Pet> sortedPetList = ;
+            //sortedPetList = GetOrderList()
+            //sortedPetList.OrderBy(p => p.Price).ToList();
+
+            //foreach (var pet in sortedPetList)
+            //{
+            //    Console.WriteLine("id: {0}\nName: {1}\nType: {2}\nBirtday: {3}\nSold date: {4}\nColor: {5}\nPrevious owner: {6}\nPrice: ${7}",
+            //        pet.Id, pet.Name, pet.Type, pet.BirthDay, pet.SoldDate, pet.Color, pet.PreviousOwner, pet.Price);
+            //    Console.WriteLine("------------------------------");
+
+            //}
+
+
         }
        
-        private void GetFiveCheapestPets()
+        void GetFiveCheapestPets()
         {
             throw new NotImplementedException();
         }
         
-        private int ShowMenu(string[] menuItems)
+        int ShowMenu(string[] menuItems)
         {
 
             Console.WriteLine("Select a menu");
@@ -226,17 +284,12 @@ namespace PetShopApp
             }
 
             int selection;
-            while (!int.TryParse(Console.ReadLine(), out selection) || selection < 1 || selection > 6)
+            while (!int.TryParse(Console.ReadLine(), out selection) || selection < 1 || selection > 8)
             {
-                Console.WriteLine("Your selection must be between 1-6");
+                Console.WriteLine("Your selection must be between 1-8");
             }
-            Console.WriteLine("Selection: " + selection);
-
-
+            
             return selection;
         }
-
-
-
     }
 }
