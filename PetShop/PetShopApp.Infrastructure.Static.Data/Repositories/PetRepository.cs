@@ -38,7 +38,7 @@ namespace PetShopApp.Infrastructure.Static.Data.Reporsitories
 
         public Pet Update(Pet petUpdate)
         {
-            var petFromDB = this.ReadById(petUpdate.Id);
+            var petFromDB = ReadById(petUpdate.Id);
             if (petFromDB != null)
             {
                 petFromDB.Name = petUpdate.Name;

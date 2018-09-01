@@ -101,19 +101,51 @@ namespace PetShopApp
                 switch (selection)
                 {
                     case 1:
-                        ShowAllPets();
+                        //List all the pets
+                        var pets = GetAllPets();
+                        ListAllPets(pets);
                         break;
                     case 2:
-                        SearchByType();
+                        //Searched By Type
+                        var input = AskQuestion("Search by Type\nEnter the searched type: ");
+                        var  searchedType = SearchType(input);
+                        GetSearchedType(searchedType);
                         break;
                     case 3:
-                        AddPet();
+                        //CreatPet
+                        string name = AskQuestion("Enter Name: ");
+                        string type = AskQuestion("Enter Type: ");
+                        DateTime bithday = DateTime.Parse(AskQuestion("Enter Birthday: "));
+                        DateTime soldDate = DateTime.Parse(AskQuestion("Enter Sold Date: "));
+                        string color = AskQuestion("Enter color: ");
+                        string previousOwner = AskQuestion("Enter Previous Owner of " + name);
+                        double price = Convert.ToDouble("Enter The Price");
+                        var pet = CreatePet(name, type, bithday, soldDate, color, previousOwner, price);
+                        SavePet(pet);
                         break;
                     case 4:
-                        UpdatePet();
+                        //Update pet
+                        Console.Clear();
+                        var id = PrintFindPetById();
+                        var onePet = FindPetById(id);
+                        GetOneId(onePet);
+                        Console.WriteLine("Updating {0}\n",onePet.Name);
+                        string newName = AskQuestion("Enter Name: ");
+                        string newType = AskQuestion("Enter Type: ");
+                        DateTime newBirthday = DateTime.Parse(AskQuestion("Enter Birthday: "));
+                        DateTime newSoldDate = DateTime.Parse(AskQuestion("Enter Sold Date: "));
+                        string newColor = AskQuestion("Enter color: ");
+                        string newPreviousOwner = AskQuestion("Enter Previous Owner of " + newName);
+                        double newPrice = Convert.ToDouble(AskQuestion("Enter The Price"));
+                        UpdatePet(id,newName,newType, newBirthday, newSoldDate,newColor,newPreviousOwner,newPrice);
                         break;
                     case 5:
-                        DeletePet();
+                        Console.Clear();
+                        Console.WriteLine("Delete a Pet\n");
+                        var idForDelete = PrintFindPetById();
+                        var petDelete = FindPetById(idForDelete);
+                        Console.WriteLine("{0} will be deleted\n", petDelete.Name);
+                        DeletePet(idForDelete);
                         break;
                     case 6:
                         SortPetByPrice();
@@ -131,23 +163,34 @@ namespace PetShopApp
             Console.ReadLine();
         }
 
-         Pet FindPetById()
-         {
+       
+
+        int PrintFindPetById()
+        {
             Console.WriteLine("Insert pet id: ");
             int id;
             if (!int.TryParse(Console.ReadLine(), out id))
             {
                 Console.WriteLine("Please insert a number ");
             }
-            return petRepository.ReadById(id);
-         }
+            return id;
 
-        void ShowAllPets()
+        }
+
+        Pet FindPetById(int id)
+        {
+            return petRepository.ReadById(id);
+        }
+
+        #region List Pets code
+        List<Pet>  GetAllPets()
+        {
+            return petRepository.ReadAll();
+        }
+        void ListAllPets(List<Pet> listOfPets)
         {
             Console.Clear();
             Console.WriteLine("List of All Pets\n");
-            
-            var listOfPets = petRepository.ReadAll();
             foreach (var pet in listOfPets)
             {
                 Console.WriteLine("id: {0}\nName: {1}\nType: {2}\nBirtday: {3}\nSold date: {4}\nColor: {5}\nPrevious owner: {6}\nPrice: ${7}",
@@ -156,37 +199,39 @@ namespace PetShopApp
 
             }
         }
+        #endregion
 
-        void SearchByType()
+        #region Searching code
+
+        List<Pet> SearchType(string input)
         {
-            throw new NotImplementedException();
+            List<Pet> pets = petRepository.ReadAll();
+            List<Pet> typeSeacrhes = pets.FindAll(p => p.Type == input);
+            return typeSeacrhes;
         }
+        void GetSearchedType(List<Pet> pets)
+        {
+            foreach (var pet in pets)
+            {
+                Console.WriteLine("id: {0}\nName: {1}\nType: {2}\nBirtday: {3}\nSold date: {4}\nColor: {5}\nPrevious owner: {6}\nPrice: ${7}",
+                     pet.Id, pet.Name, pet.Type, pet.BirthDay, pet.SoldDate, pet.Color, pet.PreviousOwner, pet.Price);
+                Console.WriteLine("------------------------------");
+            }
+              
+        }
+        #endregion 
 
-        void AddPet()
+        string AskQuestion(string question)
+        {
+           
+            Console.WriteLine(question);
+            return Console.ReadLine();
+        }
+        #region Create Pet code
+        Pet CreatePet(string name, string type, DateTime birthday, DateTime soldDate, string color, string previousOwner, double price)
         {
             Console.Clear();
             Console.WriteLine("Add a Pet\n");
-
-            Console.WriteLine("Enter Name: ");
-            string name = Console.ReadLine();
-
-            Console.WriteLine("Enter Type: ");
-            string type = Console.ReadLine();
-
-            Console.WriteLine(" Enter Birthday: "); 
-            DateTime birthday = DateTime.Parse(Console.ReadLine());
-
-            Console.WriteLine("Enter Sold Date: ");
-            DateTime soldDate = DateTime.Parse(Console.ReadLine());
-
-            Console.WriteLine("Enter Color: ");
-            string color = Console.ReadLine();
-
-            Console.WriteLine("Enter Previous Owner of " + name);
-            string previousOwner = Console.ReadLine();
-
-            Console.WriteLine("Enter The Price");
-            double price = Convert.ToDouble(Console.ReadLine());
 
             var pet = new Pet()
             {
@@ -198,81 +243,69 @@ namespace PetShopApp
                 PreviousOwner = previousOwner,
                 Price = price
             };
-
-            petRepository.Creat(pet);
-
-
+            return pet;
+            
         }
 
-        void UpdatePet()
+        Pet SavePet(Pet pet)
+        {
+            return petRepository.Creat(pet);
+        }
+        #endregion
+
+        #region Update Pet code
+
+        Pet GetOneId(Pet onePet)
+        {
+            var pet = petRepository.ReadOne(onePet.Id);
+            return pet;
+        }
+
+        void UpdatePet(int id, string newName, string newType, DateTime newBirthday, DateTime newSoldDate, string newColor, string newPreviousOwner, double newPrice)
         {
             Console.Clear();
             Console.WriteLine("Update a Pet\n");
-
-            var onePet = FindPetById();
-
-            var pet = petRepository.ReadOne(onePet.Id);
-            Console.WriteLine("id: {0}\nName: {1}\nType: {2}\nBirtday: {3}\nSold date: {4}\nColor: {5}\nPrevious owner: {6}\nPrice: ${7}",
-            pet.Id, pet.Name, pet.Type, pet.BirthDay, pet.SoldDate, pet.Color, pet.PreviousOwner, pet.Price);
-            Console.WriteLine("------------------------------");
-
-            Console.WriteLine("Enter Name: ");
-            pet.Name = Console.ReadLine();
-
-            Console.WriteLine("Enter Type: ");
-            pet.Type = Console.ReadLine();
-
-            Console.WriteLine(" Enter Birthday: ");
-            pet.BirthDay = DateTime.Parse(Console.ReadLine());
-
-            Console.WriteLine("Enter Sold Date: ");
-            pet.SoldDate= DateTime.Parse(Console.ReadLine());
-
-            Console.WriteLine("Enter Color: ");
-            pet.Color = Console.ReadLine();
-
-            Console.WriteLine("Enter Previous Owner of " + pet.Name);
-            pet.PreviousOwner = Console.ReadLine();
-
-            Console.WriteLine("Enter The Price");
-            pet.Price = Convert.ToDouble(Console.ReadLine());
+            var pet = FindPetById(id);
+            pet.Name = newName;
+            pet.Type = newType;
+            pet.BirthDay = newBirthday;
+            pet.SoldDate = newSoldDate;
+            pet.Color = newColor;
+            pet.PreviousOwner = newPreviousOwner;
+            pet.Price = newPrice;
         }
+        #endregion
 
-        void DeletePet()
+        #region Delete pet code
+        void DeletePet(int idForDelete)
         {
-            Console.Clear();
-            Console.WriteLine("Delete a Pet\n");
-            var petFound = FindPetById();
-            if(petFound != null)
-            {
-                petRepository.Delete(petFound.Id);
-            }
-        }   
+            petRepository.Delete(idForDelete);
+        }
+        #endregion
 
         void SortPetByPrice()
         {
-            //Console.Clear();
-            //Console.WriteLine("Sorting by price\n");
-            //List<Pet> sortedPetList = ;
-            //sortedPetList = GetOrderList()
-            //sortedPetList.OrderBy(p => p.Price).ToList();
+                //Console.Clear();
+                //Console.WriteLine("Sorting by price\n");
+                //List<Pet> sortedPetList = ;
+                //sortedPetList = GetOrderList()
+                //sortedPetList.OrderBy(p => p.Price).ToList();
 
-            //foreach (var pet in sortedPetList)
-            //{
-            //    Console.WriteLine("id: {0}\nName: {1}\nType: {2}\nBirtday: {3}\nSold date: {4}\nColor: {5}\nPrevious owner: {6}\nPrice: ${7}",
-            //        pet.Id, pet.Name, pet.Type, pet.BirthDay, pet.SoldDate, pet.Color, pet.PreviousOwner, pet.Price);
-            //    Console.WriteLine("------------------------------");
+                //foreach (var pet in sortedPetList)
+                //{
+                //    Console.WriteLine("id: {0}\nName: {1}\nType: {2}\nBirtday: {3}\nSold date: {4}\nColor: {5}\nPrevious owner: {6}\nPrice: ${7}",
+                //        pet.Id, pet.Name, pet.Type, pet.BirthDay, pet.SoldDate, pet.Color, pet.PreviousOwner, pet.Price);
+                //    Console.WriteLine("------------------------------");
 
-            //}
-
-
-        }
+                throw new NotImplementedException();
+            }
        
         void GetFiveCheapestPets()
         {
             throw new NotImplementedException();
         }
-        
+            
+
         int ShowMenu(string[] menuItems)
         {
 
