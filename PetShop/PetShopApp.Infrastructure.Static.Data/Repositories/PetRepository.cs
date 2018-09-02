@@ -11,17 +11,14 @@ namespace PetShopApp.Infrastructure.Static.Data.Reporsitories
         static int id = 1;
         private List<Pet> _pets = new List<Pet>();
 
-        public Pet Creat(Pet pet)
+        public Pet Create(Pet pet)
         {
             pet.Id = id++;
             _pets.Add(pet);
             return pet;
         }
 
-        public List<Pet> ReadAll()
-        {
-            return _pets;  
-        }
+       
 
         public Pet ReadById(int id)
         {
@@ -70,9 +67,14 @@ namespace PetShopApp.Infrastructure.Static.Data.Reporsitories
             return _pets[id];
         }
 
+        public IEnumerable<Pet> ReadAll()
+        {
+            return _pets;
+        }
+
         //public void Sorting()
         //{
         //    _pets.Sort();
-        }
+    }
 
 }

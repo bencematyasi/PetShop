@@ -1,4 +1,5 @@
-﻿using PetShopApp.Core.DomainService;
+﻿
+using PetShopApp.Core.ApplicationService;
 using PetShopApp.Core.Entity;
 using PetShopApp.Infrastructure.Static.Data.Reporsitories;
 using System;
@@ -8,22 +9,22 @@ using System.Text;
 
 namespace PetShopApp
 {
-    public class Printer
+    public class Printer : IPrinter
     {
         #region Repository area
-        private IPetRepository petRepository;
+        private IPetService _petService;
         #endregion
 
         #region Printer constructor
-        public Printer()    
+        public Printer(IPetService petService)    
         {
-            petRepository = new PetRepository();
+            _petService = petService;
             InitData();
-            StartUI();
+            
         }
         #endregion
 
-        #region InitDat method, move to AplicationService
+        #region InitData method, move to AplicationService
         void InitData()
         {
             Pet brunoDoggy = new Pet
@@ -36,7 +37,7 @@ namespace PetShopApp
                 PreviousOwner = "Danny Boy",
                 Price = 40
             };
-            petRepository.Creat(brunoDoggy);
+            _petService.CreatePet(brunoDoggy);
 
             Pet armandCat = new Pet
             {
@@ -48,7 +49,7 @@ namespace PetShopApp
                 PreviousOwner = "Alexandra Bummer",
                 Price = 30
             };
-            petRepository.Creat(armandCat);
+            _petService.CreatePet(armandCat);
 
             Pet sammyTurtle = new Pet
             {
@@ -60,7 +61,7 @@ namespace PetShopApp
                 PreviousOwner = "Franco Davis",
                 Price = 10
             };
-            petRepository.Creat(sammyTurtle);
+            _petService.CreatePet(sammyTurtle);
 
             Pet thunderStromHorse = new Pet
             {
@@ -73,7 +74,7 @@ namespace PetShopApp
                 PreviousOwner = "Chris Richardson ",
                 Price = 3000
             };
-            petRepository.Creat(thunderStromHorse);
+            _petService.CreatePet(thunderStromHorse);
 
             Pet lessieDoggy = new Pet
             {
@@ -85,7 +86,7 @@ namespace PetShopApp
                 PreviousOwner = "David Pizzaro",
                 Price = 22
             };
-            petRepository.Creat(lessieDoggy);
+            _petService.CreatePet(lessieDoggy);
 
             Pet furmyCat = new Pet
             {
@@ -98,13 +99,13 @@ namespace PetShopApp
                 PreviousOwner = "Chris Richardson ",
                 Price = 29
             };
-            petRepository.Creat(furmyCat);
+            _petService.CreatePet(furmyCat);
             
         }
         #endregion
 
         #region UI Part
-        void StartUI()
+         public void StartUI()
         {
             string[] menuItems =
             {
@@ -126,33 +127,36 @@ namespace PetShopApp
                 {
                     case 1:
                         //List all the pets
-                        var pets = GetAllPets();
+                        Console.Clear();
+                        var pets = _petService.GetAllPets();
                         ListAllPets(pets);
                         break;
                     case 2:
                         //Searched By Type
+                        Console.Clear();
                         var input = AskQuestion("Search by Type\nEnter the searched type: ");
-                        var  searchedType = SearchType(input);
+                        var searchedType =_petService.SearchType(input);
                         GetSearchedType(searchedType);
                         break;
                     case 3:
                         //CreatPet
+                        Console.Clear();
                         string name = AskQuestion("Enter Name: ");
                         string type = AskQuestion("Enter Type: ");
                         DateTime bithday = DateTime.Parse(AskQuestion("Enter Birthday: "));
                         DateTime soldDate = DateTime.Parse(AskQuestion("Enter Sold Date: "));
                         string color = AskQuestion("Enter color: ");
                         string previousOwner = AskQuestion("Enter Previous Owner of " + name);
-                        double price = Convert.ToDouble("Enter The Price");
-                        var pet = CreatePet(name, type, bithday, soldDate, color, previousOwner, price);
-                        SavePet(pet);
+                        double price = Convert.ToDouble(AskQuestion("Enter The Price"));
+                        var pet = _petService.NewPet(name, type, bithday, soldDate, color, previousOwner, price);
+                        _petService.CreatePet(pet);
                         break;
                     case 4:
                         //Update pet
                         Console.Clear();
-                        var id = PrintFindPetById();
-                        var onePet = FindPetById(id);
-                        GetOneId(onePet);
+                        var idForUpdate = PrintFindPetById();
+                        var onePet = _petService.FindPetById(idForUpdate);
+                        _petService.GetOneId(onePet);
                         Console.WriteLine("Updating {0}\n",onePet.Name);
                         string newName = AskQuestion("Enter Name: ");
                         string newType = AskQuestion("Enter Type: ");
@@ -161,22 +165,36 @@ namespace PetShopApp
                         string newColor = AskQuestion("Enter color: ");
                         string newPreviousOwner = AskQuestion("Enter Previous Owner of " + newName);
                         double newPrice = Convert.ToDouble(AskQuestion("Enter The Price"));
-                        UpdatePet(id,newName,newType, newBirthday, newSoldDate,newColor,newPreviousOwner,newPrice);
+                        _petService.UpdatePet(new Pet() { 
+                           Id = idForUpdate,
+                           Name = newName, 
+                           Type = newType, 
+                           BirthDay = newBirthday, 
+                           SoldDate = newSoldDate, 
+                           Color = newColor, 
+                           PreviousOwner = newPreviousOwner, 
+                           Price = newPrice
+                           });
                         break;
                     case 5:
+                        //Delete
                         Console.Clear();
                         Console.WriteLine("Delete a Pet\n");
                         var idForDelete = PrintFindPetById();
-                        var petDelete = FindPetById(idForDelete);
+                        var petDelete = _petService.FindPetById(idForDelete);
                         Console.WriteLine("{0} will be deleted\n", petDelete.Name);
-                        DeletePet(idForDelete);
+                        _petService.DeletePet(idForDelete);
                         break;
                     case 6:
-                        List<Pet> sortedPetList = GetAllPets().OrderBy(p => p.Price).ToList();
+                        //Sort Pet by Price
+                        Console.Clear();
+                        List<Pet> sortedPetList = _petService.SortingPetsList();
                         SortPetByPrice(sortedPetList);
                         break;
                     case 7:
-                        List<Pet> FiveCheapestList = GetAllPets().OrderBy(p => p.Price).Take(5).ToList();
+                        //get five cheapest pets
+                        Console.Clear();
+                        List<Pet> FiveCheapestList = _petService.GetFiveCheapsestPets();
                         GetFiveCheapestPets(FiveCheapestList);
                         break;
                     default:
@@ -203,11 +221,6 @@ namespace PetShopApp
 
         }
 
-        Pet FindPetById(int id)
-        {
-            return petRepository.ReadById(id);
-        }
-
         string AskQuestion(string question)
         {
 
@@ -216,14 +229,9 @@ namespace PetShopApp
         }
 
         #region List Pets code
-        List<Pet>  GetAllPets()
-        {
-            return petRepository.ReadAll();
-        }
-
         void ListAllPets(List<Pet> listOfPets)
         {
-            Console.Clear();
+            
             Console.WriteLine("List of All Pets\n");
             foreach (var pet in listOfPets)
             {
@@ -236,13 +244,7 @@ namespace PetShopApp
         #endregion
 
         #region Searching code
-
-        List<Pet> SearchType(string input)
-        {
-            List<Pet> pets = petRepository.ReadAll();
-            List<Pet> typeSeacrhes = pets.FindAll(p => p.Type == input);
-            return typeSeacrhes;
-        }
+        
         void GetSearchedType(List<Pet> pets)
         {
             foreach (var pet in pets)
@@ -254,71 +256,13 @@ namespace PetShopApp
               
         }
         #endregion 
-
         
-        #region Create Pet code
-        Pet CreatePet(string name, string type, DateTime birthday, DateTime soldDate, string color, string previousOwner, double price)
-        {
-            Console.Clear();
-            Console.WriteLine("Add a Pet\n");
-
-            var pet = new Pet()
-            {
-                Name = name,
-                Type = type,
-                BirthDay = birthday,
-                SoldDate = soldDate,
-                Color = color,
-                PreviousOwner = previousOwner,
-                Price = price
-            };
-            return pet;
-            
-        }
-
-        Pet SavePet(Pet pet)
-        {
-            return petRepository.Creat(pet);
-        }
-        #endregion
-
-        #region Update Pet code
-
-        Pet GetOneId(Pet onePet)
-        {
-            var pet = petRepository.ReadOne(onePet.Id);
-            return pet;
-        }
-
-        void UpdatePet(int id, string newName, string newType, DateTime newBirthday, DateTime newSoldDate, string newColor, string newPreviousOwner, double newPrice)
-        {
-            Console.Clear();
-            Console.WriteLine("Update a Pet\n");
-            var pet = FindPetById(id);
-            pet.Name = newName;
-            pet.Type = newType;
-            pet.BirthDay = newBirthday;
-            pet.SoldDate = newSoldDate;
-            pet.Color = newColor;
-            pet.PreviousOwner = newPreviousOwner;
-            pet.Price = newPrice;
-        }
-        #endregion
-
-        #region Delete pet code
-        void DeletePet(int idForDelete)
-        {
-            petRepository.Delete(idForDelete);
-        }
-        #endregion
 
         #region Sorting pet code
         void SortPetByPrice(List<Pet> sortedPetList)
         {
-            Console.Clear();
             Console.WriteLine("Sorting by price\n");
             
-           
             foreach (var pet in sortedPetList)
             {
                 Console.WriteLine("id: {0}\nName: {1}\nType: {2}\nBirtday: {3}\nSold date: {4}\nColor: {5}\nPrevious owner: {6}\nPrice: ${7}",
@@ -332,7 +276,6 @@ namespace PetShopApp
         #region Five Cheapest Pets code
         void GetFiveCheapestPets(List<Pet> sortedPetList)
         {
-            Console.Clear();
             Console.WriteLine("Sorting by price\n");
            
             foreach (var pet in sortedPetList)
